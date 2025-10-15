@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROS2 Assignment 1 - Robot Information Publisher & Subscriber</title>
+    <style>
+        @media print {
+            body { margin: 0; }
+            .page-break { page-break-before: always; }
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            color: #333;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: #16a085;
+            margin-top: 20px;
+        }
+        .info-box {
+            background-color: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .code-block {
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .answer {
+            background-color: #e8f5e9;
+            border-left: 4px solid #4caf50;
+            padding: 10px 15px;
+            margin: 10px 0;
+        }
+        .question {
+            font-weight: bold;
+            color: #d35400;
+            margin-top: 20px;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .header-info {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+        }
+        ul {
+            margin: 10px 0;
+        }
+        li {
+            margin: 5px 0;
+        }
+        .diagram {
+            background-color: #fff;
+            border: 2px solid #3498db;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-info">
+        <h1>ROS2 Assignment 1</h1>
+        <h2>Robot Information Publisher & Subscriber System</h2>
+        <p><strong>Student Name:</strong> Safyan</p>
+        <p><strong>Assignment:</strong> ROS2 Publisher-Subscriber with Coordinate Frame Transformation</p>
+        <p><strong>Date:</strong> October 2025</p>
+    </div>
+
+    <h2>1. Executive Summary</h2>
+    <div class="info-box">
+        <p>This assignment demonstrates the implementation of a ROS2 publisher-subscriber communication system with coordinate frame transformation. The project consists of two custom ROS2 packages that work together to publish robot information in a local reference frame and transform it to a global reference frame.</p>
+    </div>
+
+    <h2>2. Project Components</h2>
+
+    <h3>2.1 Package Structure</h3>
+    <table>
+        <tr>
+            <th>Package Name</th>
+            <th>Type</th>
+            <th>Purpose</th>
+        </tr>
+        <tr>
+            <td>assignment1_interfaces</td>
+            <td>Message Package</td>
+            <td>Defines custom RobotInfo message type</td>
+        </tr>
+        <tr>
+            <td>Assignment1_safyan</td>
+            <td>Python Package</td>
+            <td>Contains publisher and subscriber nodes</td>
+        </tr>
+    </table>
+
+    <h3>2.2 Custom Message Definition</h3>
+    <p><strong>Message Type:</strong> RobotInfo.msg</p>
+    <div class="code-block">
+string robot_name
+float64 x
+float64 y
+float64 theta
+float64 temperature
+    </div>
+
+    <table>
+        <tr>
+            <th>Field</th>
+            <th>Data Type</th>
+            <th>Description</th>
+        </tr>
+        <tr>
+            <td>robot_name</td>
+            <td>string</td>
+            <td>Unique identifier for the robot</td>
+        </tr>
+        <tr>
+            <td>x</td>
+            <td>float64</td>
+            <td>X-coordinate position</td>
+        </tr>
+        <tr>
+            <td>y</td>
+            <td>float64</td>
+            <td>Y-coordinate position</td>
+        </tr>
+        <tr>
+            <td>theta</td>
+            <td>float64</td>
+            <td>Orientation angle in degrees</td>
+        </tr>
+        <tr>
+            <td>temperature</td>
+            <td>float64</td>
+            <td>Temperature sensor reading in Celsius</td>
+        </tr>
+    </table>
+
+    <div class="page-break"></div>
+
+    <h2>3. Node Implementation</h2>
+
+    <h3>3.1 Publisher Node: info_local</h3>
+    <div class="info-box">
+        <p><strong>File:</strong> info_local.py</p>
+        <p><strong>Purpose:</strong> Publishes robot information in local reference frame</p>
+        <p><strong>Topic:</strong> /robot_info_local</p>
+        <p><strong>Frequency:</strong> 1 Hz (once per second)</p>
+    </div>
+
+    <h4>Functionality:</h4>
+    <ul>
+        <li>Creates a ROS2 publisher for RobotInfo messages</li>
+        <li>Publishes robot position in local coordinate frame</li>
+        <li>Adds random variation to simulate real sensor readings</li>
+        <li>Publishes temperature data</li>
+        <li>Uses timer callback for periodic publishing</li>
+    </ul>
+
+    <h4>Key Code Elements:</h4>
+    <div class="code-block">
+self.publisher_ = self.create_publisher(RobotInfo, 'robot_info_local', 10)
+self.timer = self.create_timer(1.0, self.publish_robot_info)
+
+msg.robot_name = 'robot1'
+msg.x = 5.0 + random.uniform(-0.5, 0.5)
+msg.y = 3.0 + random.uniform(-0.5, 0.5)
+msg.theta = 30.0
+msg.temperature = 25.0 + random.uniform(-2.0, 2.0)
+    </div>
+
+    <h4>Sample Output:</h4>
+    <div class="code-block">
+[INFO] [info_local]: Info Local Node has been started
+[INFO] [info_local]: Publishing: robot=robot1, pos=(5.23, 3.12, 30.00°), temp=25.43°C
+[INFO] [info_local]: Publishing: robot=robot1, pos=(5.31, 2.89, 30.00°), temp=26.12°C
+[INFO] [info_local]: Publishing: robot=robot1, pos=(4.87, 3.45, 30.00°), temp=24.78°C
+    </div>
+
+    <h3>3.2 Subscriber + Publisher Node: info_global</h3>
+    <div class="info-box">
+        <p><strong>File:</strong> info_global.py</p>
+        <p><strong>Purpose:</strong> Transforms local frame data to global reference frame</p>
+        <p><strong>Subscribes to:</strong> /robot_info_local</p>
+        <p><strong>Publishes to:</strong> /robot_info_global</p>
+    </div>
+
+    <h4>Functionality:</h4>
+    <ul>
+        <li>Subscribes to local robot information</li>
+        <li>Applies 50-degree rotation transformation</li>
+        <li>Transforms coordinates from local to global frame</li>
+        <li>Republishes transformed data</li>
+        <li>Preserves robot name and temperature (frame-independent data)</li>
+    </ul>
+
+    <h4>Sample Output:</h4>
+    <div class="code-block">
+[INFO] [info_global]: Info Global Node has been started
+[INFO] [info_global]: Frame rotation angle: 50.0°
+[INFO] [info_global]: Transformed: Local(5.23, 3.12, 30.00°) -> Global(0.97, 6.01, 80.00°), temp=25.43°C
+[INFO] [info_global]: Transformed: Local(5.31, 2.89, 30.00°) -> Global(1.19, 5.93, 80.00°), temp=26.12°C
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>4. Coordinate Frame Transformation</h2>
+
+    <h3>4.1 Mathematical Foundation</h3>
+    <p>The transformation between local and global coordinate frames involves a <strong>50-degree rotation</strong> with no translation.</p>
+
+    <div class="info-box">
+        <h4>Rotation Transformation Equations:</h4>
+        <p><strong>x<sub>global</sub> = x<sub>local</sub> × cos(50°) - y<sub>local</sub> × sin(50°)</strong></p>
+        <p><strong>y<sub>global</sub> = x<sub>local</sub> × sin(50°) + y<sub>local</sub> × cos(50°)</strong></p>
+        <p><strong>θ<sub>global</sub> = θ<sub>local</sub> + 50°</strong></p>
+    </div>
+
+    <h4>Implementation:</h4>
+    <div class="code-block">
+angle_rad = math.radians(self.rotation_angle)  # Convert 50° to radians
+
+msg_global.x = msg_local.x * math.cos(angle_rad) - msg_local.y * math.sin(angle_rad)
+msg_global.y = msg_local.x * math.sin(angle_rad) + msg_local.y * math.cos(angle_rad)
+msg_global.theta = msg_local.theta + self.rotation_angle
+
+# Normalize theta to [0, 360)
+msg_global.theta = msg_global.theta % 360.0
+    </div>
+
+    <h3>4.2 Example Calculation</h3>
+    <table>
+        <tr>
+            <th>Parameter</th>
+            <th>Local Frame</th>
+            <th>Global Frame</th>
+        </tr>
+        <tr>
+            <td>X Position</td>
+            <td>5.23</td>
+            <td>0.97</td>
+        </tr>
+        <tr>
+            <td>Y Position</td>
+            <td>3.12</td>
+            <td>6.01</td>
+        </tr>
+        <tr>
+            <td>Theta (°)</td>
+            <td>30.00</td>
+            <td>80.00</td>
+        </tr>
+        <tr>
+            <td>Temperature (°C)</td>
+            <td>25.43</td>
+            <td>25.43 (unchanged)</td>
+        </tr>
+    </table>
+
+    <h3>4.3 Why Temperature Remains Unchanged</h3>
+    <div class="answer">
+        <p>Temperature is a <strong>scalar value</strong> that does not depend on coordinate frames. Only spatial coordinates (position and orientation) change when transforming between reference frames. Temperature is an intrinsic property of the robot, independent of its position or orientation in space.</p>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>5. System Architecture</h2>
+
+    <div class="diagram">
+        <pre>
+┌─────────────────────┐
+│   info_local Node   │
+│                     │
+│  - Generates data   │
+│  - Local frame      │
+│  - 1 Hz publishing  │
+└──────────┬──────────┘
+           │
+           │ publishes
+           ▼
+    /robot_info_local
+           │
+           │ subscribes
+           ▼
+┌──────────┴──────────┐
+│  info_global Node   │
+│                     │
+│  - Receives data    │
+│  - Transforms       │
+│  - Republishes      │
+└──────────┬──────────┘
+           │
+           │ publishes
+           ▼
+    /robot_info_global
+           │
+           ▼
+    (Available for other nodes
+     or visualization)
+        </pre>
+    </div>
+
+    <h2>6. Building and Running</h2>
+
+    <h3>6.1 Build Instructions</h3>
+    <div class="code-block">
+# Navigate to workspace
+cd ~/ROS2-project
+
+# Source ROS2
+source /opt/ros/foxy/setup.bash
+
+# Build the workspace
+colcon build
+
+# Source the workspace
+source install/setup.bash
+    </div>
+
+    <h3>6.2 Running the Nodes</h3>
+    <div class="code-block">
+# Terminal 1: Run publisher node
+source install/setup.bash
+ros2 run Assignment1_safyan info_local
+
+# Terminal 2: Run subscriber node
+source install/setup.bash
+ros2 run Assignment1_safyan info_global
+    </div>
+
+    <h3>6.3 Testing and Verification</h3>
+    <div class="code-block">
+# List all topics
+ros2 topic list
+
+# Echo local frame data
+ros2 topic echo /robot_info_local
+
+# Echo global frame data
+ros2 topic echo /robot_info_global
+
+# Check message interface
+ros2 interface show assignment1_interfaces/msg/RobotInfo
+
+# View node information
+ros2 node list
+ros2 node info /info_local
+ros2 node info /info_global
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>7. Key Concepts and Questions</h2>
+
+    <div class="question">Q1: What is the publisher-subscriber pattern in ROS2?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> The publisher-subscriber pattern is a messaging paradigm where nodes communicate asynchronously through topics. Publishers send messages without knowing who receives them, and subscribers receive messages without knowing who sent them. This decouples components, allowing flexible system architecture where nodes only need to agree on topic names and message types.</p>
+        <p><strong>Benefits:</strong></p>
+        <ul>
+            <li>Loose coupling between nodes</li>
+            <li>Scalability (multiple publishers/subscribers)</li>
+            <li>Asynchronous communication</li>
+            <li>Easy to add/remove nodes</li>
+        </ul>
+    </div>
+
+    <div class="question">Q2: Why create a custom message type instead of using standard messages?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> Standard ROS2 messages like geometry_msgs/Point or std_msgs/Float64 cannot efficiently package all required data together. The custom RobotInfo message:</p>
+        <ul>
+            <li>Groups related data (name, position, temperature) in one structure</li>
+            <li>Provides type safety and clear data contracts</li>
+            <li>Makes code more maintainable and readable</li>
+            <li>Allows semantic meaning (what the data represents)</li>
+            <li>Enables efficient single-message communication instead of multiple separate messages</li>
+        </ul>
+    </div>
+
+    <div class="question">Q3: Explain the coordinate transformation. Why 50 degrees?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> The transformation converts coordinates from a local reference frame to a global reference frame. The local frame is rotated 50° relative to the global frame.</p>
+        <p><strong>Rotation Matrix Mathematics:</strong></p>
+        <ul>
+            <li>x_global = x_local × cos(50°) - y_local × sin(50°)</li>
+            <li>y_global = x_local × sin(50°) + y_local × cos(50°)</li>
+            <li>θ_global = θ_local + 50°</li>
+        </ul>
+        <p>The 50° value represents the angular offset between the two coordinate systems. In real robotics applications, this angle would come from:</p>
+        <ul>
+            <li>Sensor calibration data</li>
+            <li>SLAM (Simultaneous Localization and Mapping) algorithms</li>
+            <li>Pre-configured robot setup parameters</li>
+            <li>Camera or LIDAR mounting angles</li>
+        </ul>
+    </div>
+
+    <div class="question">Q4: What is the significance of the queue size (10)?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> The queue size determines the buffer capacity for messages:</p>
+        <ul>
+            <li>If processing is slower than publishing, messages queue up</li>
+            <li>When the queue is full (10 messages), the oldest message is dropped</li>
+            <li>Prevents memory overflow in high-frequency systems</li>
+            <li>For 1 Hz publishing, a queue of 10 provides 10 seconds of buffer time</li>
+        </ul>
+        <p><strong>Queue Size Selection:</strong></p>
+        <ul>
+            <li>Low frequency (1-10 Hz): Queue size 10 is sufficient</li>
+            <li>Medium frequency (30-100 Hz): Queue size 10-50</li>
+            <li>High frequency (>100 Hz): Queue size 100+</li>
+        </ul>
+    </div>
+
+    <div class="question">Q5: What happens if info_global starts before info_local?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> ROS2 does not require publishers to exist before subscribers. If info_global starts first:</p>
+        <ul>
+            <li>The subscriber will be created and wait for messages</li>
+            <li>No error occurs - the node simply waits</li>
+            <li>Once info_local starts publishing, info_global receives messages</li>
+            <li>The callback function (listener_callback) executes automatically</li>
+        </ul>
+        <p>This demonstrates ROS2's <strong>discovery mechanism</strong> where nodes find each other dynamically at runtime.</p>
+    </div>
+
+    <div class="question">Q6: How does the callback function work?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> The callback function implements <strong>event-driven programming</strong>:</p>
+        <ul>
+            <li>When a message arrives on /robot_info_local, ROS2 automatically calls listener_callback(msg_local)</li>
+            <li>The function executes in response to incoming data, not on a fixed schedule</li>
+            <li>Each message triggers one callback execution</li>
+            <li>Processing happens asynchronously - doesn't block other operations</li>
+        </ul>
+        <p><strong>Callback Sequence:</strong></p>
+        <ol>
+            <li>Message arrives on subscribed topic</li>
+            <li>ROS2 middleware triggers the callback</li>
+            <li>Callback receives message as parameter</li>
+            <li>Transformation logic executes</li>
+            <li>Result is published to output topic</li>
+            <li>Callback completes, ready for next message</li>
+        </ol>
+    </div>
+
+    <div class="question">Q7: Why use math.radians() in the transformation?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> Python's trigonometric functions (math.cos, math.sin) expect angles in <strong>radians</strong>, not degrees.</p>
+        <p><strong>Conversion:</strong></p>
+        <ul>
+            <li>50° = 0.8727 radians</li>
+            <li>Formula: radians = degrees × (π / 180)</li>
+            <li>math.radians(50.0) performs this conversion</li>
+        </ul>
+        <p><strong>Common Error:</strong> Forgetting this conversion produces incorrect results because cos(50 radians) ≠ cos(50 degrees)</p>
+    </div>
+
+    <div class="question">Q8: What is the publishing rate and why 1 Hz?</div>
+    <div class="answer">
+        <p><strong>Answer:</strong> 1 Hz means once per second (1 hertz = 1 cycle per second).</p>
+        <p><strong>Rate Selection Rationale:</strong></p>
+        <ul>
+            <li>1 Hz chosen for clarity and easy observation during testing</li>
+            <li>Allows manual verification of transformations</li>
+            <li>Reduces computational load for educational purposes</li>
+        </ul>
+        <p><strong>Real-World Publishing Rates:</strong></p>
+        <table>
+            <tr>
+                <th>Sensor/System</th>
+                <th>Typical Rate</th>
+            </tr>
+            <tr>
+                <td>IMU (Inertial Measurement Unit)</td>
+                <td>100-1000 Hz</td>
+            </tr>
+            <tr>
+                <td>Camera</td>
+                <td>30-60 Hz</td>
+            </tr>
+            <tr>
+                <td>LIDAR</td>
+                <td>10-40 Hz</td>
+            </tr>
+            <tr>
+                <td>GPS</td>
+                <td>1-10 Hz</td>
+            </tr>
+            <tr>
+                <td>Robot Position Updates</td>
+                <td>10-50 Hz</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="page-break"></div>
+
+    <h2>8. Real-World Applications</h2>
+
+    <h3>8.1 Coordinate Frame Transformations in Robotics</h3>
+    <div class="info-box">
+        <p>Coordinate frame transformations are fundamental in robotics for:</p>
+        <ul>
+            <li><strong>Multi-sensor fusion:</strong> Combining data from cameras, LIDAR, and IMU mounted at different positions</li>
+            <li><strong>Robot arms:</strong> Converting from joint space to Cartesian space</li>
+            <li><strong>Navigation:</strong> Transforming between robot frame, map frame, and world frame</li>
+            <li><strong>Vision systems:</strong> Converting camera coordinates to robot coordinates</li>
+            <li><strong>Collaborative robots:</strong> Sharing position data between multiple robots</li>
+        </ul>
+    </div>
+
+    <h3>8.2 Publisher-Subscriber Pattern Uses</h3>
+    <ul>
+        <li><strong>Sensor data distribution:</strong> One sensor, multiple processing nodes</li>
+        <li><strong>Modular architecture:</strong> Easy to add new functionality without modifying existing code</li>
+        <li><strong>Data logging:</strong> Recording all sensor data without affecting system performance</li>
+        <li><strong>Distributed systems:</strong> Nodes can run on different machines</li>
+    </ul>
+
+    <h2>9. Testing and Validation</h2>
+
+    <h3>9.1 Manual Verification</h3>
+    <p>To verify transformation correctness:</p>
+    <ol>
+        <li>Record local coordinates from info_local output</li>
+        <li>Manually calculate expected global coordinates using transformation equations</li>
+        <li>Compare calculated values with info_global output</li>
+        <li>Verify theta = local_theta + 50° and temperature remains constant</li>
+    </ol>
+
+    <h3>9.2 Automated Testing Methods</h3>
+    <div class="code-block">
+# Example test case:
+# Local: x=5.0, y=3.0, theta=30°
+#
+# Expected Global:
+# x_global = 5.0 * cos(50°) - 3.0 * sin(50°) = 5.0 * 0.6428 - 3.0 * 0.7660 = 0.93
+# y_global = 5.0 * sin(50°) + 3.0 * cos(50°) = 5.0 * 0.7660 + 3.0 * 0.6428 = 5.76
+# theta_global = 30° + 50° = 80°
+    </div>
+
+    <h2>10. Potential Improvements</h2>
+
+    <h3>System Enhancements:</h3>
+    <ul>
+        <li><strong>Dynamic parameters:</strong> Make rotation angle configurable via ROS2 parameters</li>
+        <li><strong>Error handling:</strong> Add bounds checking and error reporting</li>
+        <li><strong>Multiple robots:</strong> Support multiple robot names dynamically</li>
+        <li><strong>Visualization:</strong> Integrate with RViz2 to visualize both coordinate frames</li>
+        <li><strong>Performance monitoring:</strong> Add timestamps to measure transformation latency</li>
+        <li><strong>3D transformation:</strong> Extend to 3D coordinates with roll, pitch, yaw</li>
+        <li><strong>TF2 integration:</strong> Use ROS2's tf2 library for standard frame transformations</li>
+    </ul>
+
+    <div class="page-break"></div>
+
+    <h2>11. Conclusion</h2>
+
+    <div class="info-box">
+        <p>This assignment successfully demonstrates core ROS2 concepts:</p>
+        <ul>
+            <li>✅ Custom message creation and usage</li>
+            <li>✅ Publisher-subscriber communication pattern</li>
+            <li>✅ Coordinate frame transformation mathematics</li>
+            <li>✅ Real-time data processing and republishing</li>
+            <li>✅ Proper node lifecycle management</li>
+            <li>✅ Event-driven callback programming</li>
+        </ul>
+
+        <p>The implementation showcases how ROS2 enables modular, scalable robotic systems where components communicate asynchronously through well-defined interfaces. The coordinate transformation demonstrates practical application of mathematical concepts in robotics, essential for sensor fusion, navigation, and multi-robot systems.</p>
+    </div>
+
+    <h2>12. References and Resources</h2>
+
+    <h3>ROS2 Documentation:</h3>
+    <ul>
+        <li>ROS2 Foxy Documentation: https://docs.ros.org/en/foxy/</li>
+        <li>ROS2 Tutorials: https://docs.ros.org/en/foxy/Tutorials.html</li>
+        <li>Custom Message Interfaces: https://docs.ros.org/en/foxy/Tutorials/Custom-ROS2-Interfaces.html</li>
+    </ul>
+
+    <h3>Mathematical Background:</h3>
+    <ul>
+        <li>2D Rotation Matrices</li>
+        <li>Coordinate Frame Transformations</li>
+        <li>Homogeneous Transformations</li>
+    </ul>
+
+    <h2>13. GitHub Repository</h2>
+    <div class="info-box">
+        <p><strong>Repository URL:</strong> https://github.com/SAFYAN-ELE/ROS2-project</p>
+        <p><strong>Contents:</strong></p>
+        <ul>
+            <li>Complete source code for both packages</li>
+            <li>README with build and usage instructions</li>
+            <li>Sample output documentation</li>
+            <li>Configuration files (package.xml, setup.py)</li>
+        </ul>
+    </div>
+
+    <h2>14. Assignment Checklist</h2>
+
+    <table>
+        <tr>
+            <th>Requirement</th>
+            <th>Status</th>
+            <th>Implementation</th>
+        </tr>
+        <tr>
+            <td>Create ROS2 package</td>
+            <td>✅ Complete</td>
+            <td>Assignment1_safyan package created</td>
+        </tr>
+        <tr>
+            <td>Custom message with robot info</td>
+            <td>✅ Complete</td>
+            <td>RobotInfo.msg with 5 fields</td>
+        </tr>
+        <tr>
+            <td>Publisher node</td>
+            <td>✅ Complete</td>
+            <td>info_local publishes at 1 Hz</td>
+        </tr>
+        <tr>
+            <td>Subscriber node</td>
+            <td>✅ Complete</td>
+            <td>info_global subscribes and transforms</td>
+        </tr>
+        <tr>
+            <td>Coordinate transformation</td>
+            <td>✅ Complete</td>
+            <td>50° rotation applied correctly</td>
+        </tr>
+        <tr>
+            <td>Preserve non-spatial data</td>
+            <td>✅ Complete</td>
+            <td>Temperature and name unchanged</td>
+        </tr>
+        <tr>
+            <td>Testing and verification</td>
+            <td>✅ Complete</td>
+            <td>Nodes tested successfully</td>
+        </tr>
+        <tr>
+            <td>Documentation</td>
+            <td>✅ Complete</td>
+            <td>README and sample outputs</td>
+        </tr>
+    </table>
+
+    <div class="header-info" style="margin-top: 50px;">
+        <p><strong>Submitted by:</strong> Safyan</p>
+        <p><strong>Email:</strong> safyanzeb2014@gmail.com</p>
+        <p><strong>GitHub:</strong> https://github.com/SAFYAN-ELE/ROS2-project</p>
+    </div>
+
+</body>
+</html>
