@@ -1,6 +1,6 @@
 from setuptools import setup
 
-package_name = 'Assignment1_Muaz'
+package_name = 'Assignment1_safyan'
 
 setup(
     name=package_name,
@@ -20,8 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'info_local = Assignment1_Muaz.info_local:main',
-            'info_global = Assignment1_Muaz.info_global:main',
+            'info_local = Assignment1_safyan.info_local:main',
+            'info_global = Assignment1_safyan.info_global:main',
         ],
     },
 )
