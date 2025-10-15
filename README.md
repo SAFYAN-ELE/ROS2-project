@@ -13,7 +13,7 @@ Custom ROS 2 message package containing:
   - `theta` (float64): Orientation angle in degrees
   - `temperature` (float64): Current temperature reading
 
-### 2. Assignment1_Muaz
+### 2. Assignment1_safyan
 Main package containing two nodes:
 
 #### Node 1: info_local
@@ -83,13 +83,13 @@ source install/setup.bash
 ### Terminal 1 - Run info_local node:
 ```bash
 source install/setup.bash
-ros2 run Assignment1_Muaz info_local
+ros2 run Assignment1_safyan info_local
 ```
 
 ### Terminal 2 - Run info_global node:
 ```bash
 source install/setup.bash
-ros2 run Assignment1_Muaz info_global
+ros2 run Assignment1_safyan info_global
 ```
 
 ## Testing
@@ -130,7 +130,7 @@ ros2 interface show assignment1_interfaces/msg/RobotInfo
 
 ## Assignment Requirements Checklist
 
-- ✅ Created ROS package named 'Assignment1_Muaz'
+- ✅ Created ROS package named 'Assignment1_safyan'
 - ✅ Created custom ROS message (RobotInfo) with robot_name, position (x, y, θ), and temperature
 - ✅ Implemented 'info_local' node that publishes robot information
 - ✅ Implemented 'info_global' node that subscribes, transforms coordinates, and republishes
@@ -139,7 +139,7 @@ ros2 interface show assignment1_interfaces/msg/RobotInfo
 - ✅ Successfully tested both nodes
 
 ## Author
-Muaz
+Safyan
 
 ## License
 TODO: License declaration
